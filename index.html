@@ -15,22 +15,23 @@
         </div>
     </nav>
 
-    <main class="container-fluid d-flex">
+    <main class="container-fluid row">
 
-        <div class="left-side col-3">
+        <div class="left-side col-12 col-md-3">
             <div class="search-wrapper">
                 <form id="city-form" class="d-flex flex-column p-1">
                     <label for="city">Search for a City:</label>
                     <input type="text" name="city" id="city" class="mb-1">
-                    <input type="submit" class="search-btn">
+                    <input type="submit" id="search-btn">
                 </form>
             </div>
-            <div class="previous-searches d-flex flex-column"></div>
+            <div id="previous-searches"></div>
+            <div class="savedSearchBtn">Tester</div>
         </div>
 
-        <div class="right-wrapper col-9">
+        <div class="right-wrapper col">
             <div class="today-wrapper border border-3">
-                <h1 id="location"></h1><img id="currentIcon"/>
+                <h1 id="location" class="d-inline"></h1><img id="currentIcon"/>
                 <p id="temp"></p>
                 <p id="wind"></p>
                 <p id="humidity"></p>
@@ -38,7 +39,7 @@
             </div>
             <div class="future-wrapper">
                 <h3>5 Day Forecast</h3>
-                <div id="flex-container" class="d-flex justify-content-between">
+                <div id="forecast-container" class="d-flex justify-content-between">
                     <!-- <div class="future-day p-1">
                         <h5 data-type="date">Date</h5>
                         <p data-type="icon">Icon</p>

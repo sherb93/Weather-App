@@ -1,20 +1,17 @@
+// GLOBAL VARIABLES //
 var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
 var cityInputEl = $("#city")
 var today = moment().format("L");
+var submitBtn = $("#search-btn");
 
+// DISPLAYING HEADER INFORMATION //
+var displayHeader = function(data) {
+    var location = $("#location");
+    location.text(data.name + " " + today)
 
-// var formSubmit = function() {
-//     var city = cityInputEl.val();
-
-//     console.log(city);
-
-//     if (city) {
-//         getCityWeather(city);
-//     } else {
-//         alert("Please enter a valid US city");
-//     }
-// };
+    getWeatherIcon(data.weather[0].icon);
+}
 
 var getWeatherIcon = function(iconCode) {
     var icon = $("#currentIcon");
@@ -23,56 +20,15 @@ var getWeatherIcon = function(iconCode) {
     icon.attr("src", iconUrl);
 }
 
-//FETCHES LONGITUDE AND LATITUDE FROM CITY
-var getCityWeather = function (city) {
-    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${APIKey}`
-
-    fetch(apiUrl).then(function (response) {
-        if (response.ok) {
-            response.json().then(function (data) {
-                //Creates variables for long and lat values that are used to fetch meaningful data from the onecall API
-                var longitude = data.coord.lon;
-                var latitude = data.coord.lat;
-
-                // This is the function for onecall API
-                runOneCallWeather(latitude, longitude);
-            });
-        } else {
-            alert("Error: " + response.statusText);
-        }
-    })
-    .catch(function (error) {
-        alert("Unable to connect to OpenWeather");
-    })
-};
-
-var runOneCallWeather = function(latitude, longitude) {
-
-    fetch(`https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=${latitude}&lon=${longitude}&appid=${APIKey}`).then(function (response) {
-        if (response.ok) {
-            response.json().then(function (data) {
-                console.log(data);
-                displayWeather(data);
-            });
-        } else {
-            alert("Error: " + response.statusText);
-        }
-    })
-    .catch(function (error) {
-        alert("Unable to connect to OpenWeather");
-    })
-}
-
 var displayWeather = function(data) {
-    var location = $("#location");
+    $("#forecast-container").empty();
+
     var iconCode = data.current.weather[0].icon;
     var temperature = $("#temp");
     var wind = $("#wind");
     var humidity = $("#humidity");
     var UVIndex = $("#uv-index");
 
-    location.text(`${today}`)
-    getWeatherIcon(iconCode)
     temperature.text(`Temp: ${data.current.temp}°F`);
     wind.text(`Wind: ${data.current.wind_speed} MPH`);
     humidity.text(`Humidity: ${data.current.humidity} %`);
@@ -107,11 +63,88 @@ var displayWeather = function(data) {
         blockEl.append(windEl);
         blockEl.append(humidityEl);
 
-        $("#flex-container").append(blockEl);
+        $("#forecast-container").append(blockEl);
 
     }
 }
 
-getCityWeather("Atlanta");
+// FETCH API's //
+var getCityWeather = function (city) {
+    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${APIKey}`
 
-// cityFormEl.on('submit', formSubmit);
+    fetch(apiUrl).then(function (response) {
+        if (response.ok) {
+            response.json().then(function (data) {
+                //Creates variables for long and lat values that are used to fetch meaningful data from the onecall API
+                var longitude = data.coord.lon;
+                var latitude = data.coord.lat;
+                var cityName = data.name;
+
+                saveResult(cityName);
+                displayHeader(data)
+                runOneCallWeather(latitude, longitude);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    })
+    .catch(function (error) {
+        alert("Unable to connect to OpenWeather");
+    })
+};
+
+var runOneCallWeather = function(latitude, longitude) {
+
+    fetch(`https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=${latitude}&lon=${longitude}&appid=${APIKey}`).then(function (response) {
+        if (response.ok) {
+            response.json().then(function (data) {
+                console.log(data);
+                displayWeather(data);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    })
+    .catch(function (error) {
+        alert("Unable to connect to OpenWeather");
+    })
+}
+
+// LOCAL STORAGE HANDLERS //
+var saveResult = function(cityName) {
+    //Create an if statment for Clear button. append if historyEl has no children
+
+    var historyEl = $("#previous-searches");
+    var newBtn = $("<div>");
+
+    newBtn.text(cityName);
+    newBtn.addClass("savedSearchBtn");
+    historyEl.prepend(newBtn);
+
+    var saveToLS = function() {
+        saveValue = historyEl.children.length;
+        localStorage.setItem("weather-app-city", cityName);
+    };
+
+    saveToLS();
+}
+
+
+// BUTTON LISTENERS //
+cityFormEl.on("submit", function(event) {
+    console.log(cityInputEl.val());
+    event.preventDefault();
+    
+    if (!cityInputEl) {
+        alert("You must enter a city into the search box.")
+    } else {
+        getCityWeather(cityInputEl.val());
+    }
+});
+
+// getCityWeather("Atlanta");
+
+var todayWrapper = document.querySelector(".today-wrapper");
+console.log(todayWrapper.children.length);
+
+console.log(document.getElementById("previous-searches").children.length);
