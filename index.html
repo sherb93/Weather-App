@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="./assets/css/style.css">
-    <title>Weather</title>
+    <title>Weather NOW</title>
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark">
@@ -15,27 +15,35 @@
         </div>
     </nav>
 
-    <main class="container-fluid row">
+    <main class="container d-flex mt-3">
 
         <div class="left-side col-12 col-md-3">
             <div class="search-wrapper">
                 <form id="city-form" class="d-flex flex-column p-1">
-                    <label for="city">Search for a City:</label>
-                    <input type="text" name="city" id="city" class="mb-1">
+                    <input type="text" name="city" id="city" class="mb-1" placeholder="Search City">
                     <input type="submit" id="search-btn">
                 </form>
             </div>
             <div id="previous-searches"></div>
-            <div class="savedSearchBtn">Tester</div>
         </div>
 
         <div class="right-wrapper col">
             <div class="today-wrapper border border-3">
-                <h1 id="location" class="d-inline"></h1><img id="currentIcon"/>
-                <p id="temp"></p>
-                <p id="wind"></p>
-                <p id="humidity"></p>
-                <p id="uv-index"></p>
+                <div class="today-title">
+                    <h5 id="location" class="p-2 "></h5>
+                </div>
+                <div class="today-content p-2 d-flex justify-content-between">
+                    <div class="information">
+                        <p id="temp"></p>
+                        <p id="wind"></p>
+                        <p id="humidity"></p>
+                        <p id="uv-index">
+                            UV:
+                            <span id="uv-scale"></span>
+                        </p>
+                    </div>
+                    <img id="currentIcon"/>
+                </div>
             </div>
             <div class="future-wrapper">
                 <h3>5 Day Forecast</h3>
