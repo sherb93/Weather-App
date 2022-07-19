@@ -1,8 +1,36 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+.today-wrapper {
+}
+
+.title-container {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.title {
+    padding: 0.5rem;
+    color: white;
+}
+
+.today-content > * {
+    
+}
+
+.information > * {
+    margin: 0;
+    padding: 0;
+    font-weight: 600;
+}
+
+.information > #temp {
+    font-size: 3rem;
 
 }
+
 
 .savedSearchBtn {
     display: block;

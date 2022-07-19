@@ -29,12 +29,12 @@
 
         <div class="right-wrapper">
 
-            <div class="today-wrapper border border-3">
-                <div class="title">
-                    <h5 id="location" class="p-2 "></h5>
+            <div class="today-wrapper border rounded">
+                <div class="title-container">
+                    <h5 id="location" class="title"></h5>
                 </div>
                 <div class="today-content p-2 d-flex justify-content-between">
-                    <div class="information">
+                    <div class="information d-flex flex-column">
                         <p id="temp"></p>
                         <p id="wind"></p>
                         <p id="humidity"></p>
@@ -47,9 +47,9 @@
                 </div>
             </div>
 
-            <div class="future-wrapper border">
-                <div class="title">
-                    <h5>Weekly Forecast for <span id="location2"></span></h5>
+            <div class="future-wrapper border rounded">
+                <div class="title-container">
+                    <h5 class="title">Weekly Forecast for <span id="location2"></span></h5>
                 </div>
                 <div id="forecast-container" class="d-flex justify-content-between"></div> 
             </div>
