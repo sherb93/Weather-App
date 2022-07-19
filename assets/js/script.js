@@ -3,36 +3,77 @@ var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
 var cityInputEl = $("#city")
 var today = moment().format("L");
+var currentTime = moment().format("HH:mm");
 var submitBtn = $("#search-btn");
+var historyEl = $("#previous-searches");
 
 // DISPLAYING HEADER INFORMATION //
 var displayHeader = function(data) {
+    // local variables
     var location = $("#location");
-    location.text(data.name + " " + today)
+    var currentHour = moment().format("H");
+
+    // local functions for time period and weather icon
+    var timeOfDay = function() {
+        if (currentHour < 12) {
+            return "am";
+        } else if (currentHour === 12) {
+            return "pm";
+        } else {
+            return "pm";
+        };
+    };
+
+    var getWeatherIcon = function(iconCode) {
+        var icon = $("#currentIcon");
+        var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+    
+        icon.attr("src", iconUrl);
+    }
+
+    // displays current information to today's header
+    location.html(`<small class="text-muted"></small>`);
+    location.prepend(`${data.name} `);
+    location.children("small").text(`as of ${currentTime} ${timeOfDay()}`);
 
     getWeatherIcon(data.weather[0].icon);
-}
-
-var getWeatherIcon = function(iconCode) {
-    var icon = $("#currentIcon");
-    var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
-
-    icon.attr("src", iconUrl);
 }
 
 var displayWeather = function(data) {
     $("#forecast-container").empty();
 
-    var iconCode = data.current.weather[0].icon;
+    var UV = data.current.uvi;
+
     var temperature = $("#temp");
     var wind = $("#wind");
     var humidity = $("#humidity");
-    var UVIndex = $("#uv-index");
+    var UVScale = $("#uv-scale");
 
-    temperature.text(`Temp: ${data.current.temp}°F`);
+    temperature.text(`${data.current.temp}°F`);
     wind.text(`Wind: ${data.current.wind_speed} MPH`);
     humidity.text(`Humidity: ${data.current.humidity} %`);
-    UVIndex.text(`UV Index: ${data.current.uvi}`);
+    UVScale.text(`${UV}`);
+
+    // sets color of UV index
+    switch (true) {
+        case UV < 3:
+            UVScale.css("background", "#66b94d");
+            break;
+        case UV >= 3 && UV < 6:
+            UVScale.css("background", "#fcbd1e");
+            break;
+        case UV >= 6 && UV < 8:
+            UVScale.css("background", "#f66b34");
+            break;
+        case UV >= 8 && UV < 10:
+            UVScale.css("background", "#ee154a");
+            break;
+        case UV >= 11:
+            UVScale.css("background", "#7b439c");
+            break;
+        default:
+            UVScale.css("background", "none");
+    }
 
     for (var i = 0; i < 5; i++){
         var blockEl = $("<div>")
@@ -79,7 +120,7 @@ var getCityWeather = function (city) {
                 var longitude = data.coord.lon;
                 var latitude = data.coord.lat;
                 var cityName = data.name;
-
+                console.log(data);
                 saveResult(cityName);
                 displayHeader(data)
                 runOneCallWeather(latitude, longitude);
@@ -98,7 +139,6 @@ var runOneCallWeather = function(latitude, longitude) {
     fetch(`https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=${latitude}&lon=${longitude}&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
-                console.log(data);
                 displayWeather(data);
             });
         } else {
@@ -113,17 +153,24 @@ var runOneCallWeather = function(latitude, longitude) {
 // LOCAL STORAGE HANDLERS //
 var saveResult = function(cityName) {
     //Create an if statment for Clear button. append if historyEl has no children
+    var historyElLength = historyEl.children().length;
 
-    var historyEl = $("#previous-searches");
-    var newBtn = $("<div>");
+    if (historyElLength >= 8) {
+        historyEl.child
+
+    }
+
+    var newBtn = $("<button>");
+    var randomNum = Math.floor(Math.random() * 100);
 
     newBtn.text(cityName);
     newBtn.addClass("savedSearchBtn");
     historyEl.prepend(newBtn);
-
+    // GOAL HERE is to use the child nodes value to assign local storage keys 
     var saveToLS = function() {
-        saveValue = historyEl.children.length;
-        localStorage.setItem("weather-app-city", cityName);
+        if (historyEl.children().length <= 8) {
+            localStorage.setItem(`city${randomNum}`, cityName);
+        }
     };
 
     saveToLS();
@@ -132,7 +179,6 @@ var saveResult = function(cityName) {
 
 // BUTTON LISTENERS //
 cityFormEl.on("submit", function(event) {
-    console.log(cityInputEl.val());
     event.preventDefault();
     
     if (!cityInputEl) {
@@ -142,9 +188,7 @@ cityFormEl.on("submit", function(event) {
     }
 });
 
-// getCityWeather("Atlanta");
+//Initialize page with Atlanta, GA
+getCityWeather("Atlanta");
 
 var todayWrapper = document.querySelector(".today-wrapper");
-console.log(todayWrapper.children.length);
-
-console.log(document.getElementById("previous-searches").children.length);
