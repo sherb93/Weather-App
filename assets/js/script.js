@@ -3,7 +3,7 @@ var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
 var cityInputEl = $("#city")
 var today = moment().format("L");
-var currentTime = moment().format("HH:mm");
+var currentTime = moment().format("HH:mm a");
 var submitBtn = $("#search-btn");
 var historyEl = $("#previous-searches");
 
@@ -11,18 +11,7 @@ var historyEl = $("#previous-searches");
 var displayHeader = function(data) {
     // local variables
     var location = $("#location");
-    var currentHour = moment().format("H");
-
-    // local functions for time period and weather icon
-    var timeOfDay = function() {
-        if (currentHour < 12) {
-            return "am";
-        } else if (currentHour === 12) {
-            return "pm";
-        } else {
-            return "pm";
-        };
-    };
+    var location2 = $("#location2");
 
     var getWeatherIcon = function(iconCode) {
         var icon = $("#currentIcon");
@@ -31,10 +20,12 @@ var displayHeader = function(data) {
         icon.attr("src", iconUrl);
     }
 
-    // displays current information to today's header
+    // displays current information to today's header & forecast
     location.html(`<small class="text-muted"></small>`);
     location.prepend(`${data.name} `);
-    location.children("small").text(`as of ${currentTime} ${timeOfDay()}`);
+    location.children("small").text(`as of ${currentTime}`);
+
+    location2.text(`${data.name}`);
 
     getWeatherIcon(data.weather[0].icon);
 }
@@ -49,9 +40,9 @@ var displayWeather = function(data) {
     var humidity = $("#humidity");
     var UVScale = $("#uv-scale");
 
-    temperature.text(`${data.current.temp}°F`);
-    wind.text(`Wind: ${data.current.wind_speed} MPH`);
-    humidity.text(`Humidity: ${data.current.humidity} %`);
+    temperature.text(`${Math.trunc(data.current.temp)}°`);
+    wind.text(`Wind ${data.current.wind_speed} mph `);
+    humidity.text(`RH ${data.current.humidity}%`);
     UVScale.text(`${UV}`);
 
     // sets color of UV index
@@ -76,13 +67,18 @@ var displayWeather = function(data) {
     }
 
     for (var i = 0; i < 5; i++){
+        // create HTML elements
         var blockEl = $("<div>")
         var headingEl = $("<h6>")
-        var tempEl = $("<p>")
+        var highEl = $("<p>")
+        var lowEl = $("<p>")
         var windEl = $("<p>")
         var humidityEl = $("<p>")
+
+        // forecast icon code from the fetch request
         var forecastIconCode = data.daily[i].weather[0].icon;
 
+        // fetches and appends forecast icon to forecast block
         var getForecastIcon = function(iconCode) {
             var iconEl = $("<img>");
             var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + ".png";
@@ -91,16 +87,20 @@ var displayWeather = function(data) {
             blockEl.append(iconEl);   
         }
 
-        blockEl.addClass( ["bg-info", "text-white", "p-1"] )
+        blockEl.addClass( ["forecast-block"] )
 
-        headingEl.text(moment().add(i + 1, "day").format("L"));
-        tempEl.text(`Temp: ${data.daily[i].temp.day}°F`);
+        // adding and styling information for each forecast block
+        headingEl.text(moment().add(i + 1, "day").format("ddd D"));
+        highEl.text(`${Math.trunc(data.daily[i].temp.max)}°F`);
+        lowEl.text(`${Math.trunc(data.daily[i].temp.min)}°`);
         windEl.text(`Wind: ${data.daily[i].wind_speed} MPH`);
-        humidityEl.text(`Humidity: ${data.daily[i].humidity} %`);
+        humidityEl.text(`${data.daily[i].humidity}% RH`);
 
+        // append all info to each forecast block
         blockEl.append(headingEl);
+        blockEl.append(highEl);
+        blockEl.append(lowEl);
         getForecastIcon(forecastIconCode);
-        blockEl.append(tempEl);
         blockEl.append(windEl);
         blockEl.append(humidityEl);
 
@@ -139,6 +139,7 @@ var runOneCallWeather = function(latitude, longitude) {
     fetch(`https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=${latitude}&lon=${longitude}&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
+                console.log(data);
                 displayWeather(data);
             });
         } else {

@@ -15,9 +15,9 @@
         </div>
     </nav>
 
-    <main class="container d-flex mt-3">
+    <main class="container mt-3 d-flex justify-content-center">
 
-        <div class="left-side col-12 col-md-3">
+        <div class="left-side col-12 col-md-2">
             <div class="search-wrapper">
                 <form id="city-form" class="d-flex flex-column p-1">
                     <input type="text" name="city" id="city" class="mb-1" placeholder="Search City">
@@ -27,9 +27,10 @@
             <div id="previous-searches"></div>
         </div>
 
-        <div class="right-wrapper col">
+        <div class="right-wrapper">
+
             <div class="today-wrapper border border-3">
-                <div class="today-title">
+                <div class="title">
                     <h5 id="location" class="p-2 "></h5>
                 </div>
                 <div class="today-content p-2 d-flex justify-content-between">
@@ -45,18 +46,14 @@
                     <img id="currentIcon"/>
                 </div>
             </div>
-            <div class="future-wrapper">
-                <h3>5 Day Forecast</h3>
-                <div id="forecast-container" class="d-flex justify-content-between">
-                    <!-- <div class="future-day p-1">
-                        <h5 data-type="date">Date</h5>
-                        <p data-type="icon">Icon</p>
-                        <p data-type="temperature">Temp</p>
-                        <p data-type="humidity">Humitidty</p>
-                        <p data-type="UV">UV</p>
-                    </div> -->
-                </div> 
+
+            <div class="future-wrapper border">
+                <div class="title">
+                    <h5>Weekly Forecast for <span id="location2"></span></h5>
+                </div>
+                <div id="forecast-container" class="d-flex justify-content-between"></div> 
             </div>
+
         </div>
 
     </main>
