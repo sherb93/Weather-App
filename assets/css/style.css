@@ -28,7 +28,9 @@ img {
 
 
 body {
-    background: darkblue;
+    background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);
+    background-repeat: no-repeat;
+    height: 100vh;
 }
 
 /*///// MAIN PAGE ///////*/
@@ -57,6 +59,7 @@ form > * {
     background: #204f7a;
     color: white;
     border-width: 0px;
+    text-align: center;
 }
 
 .weather-border {
@@ -69,7 +72,7 @@ form > * {
 .content__current {
     background-image: url("../icons/sunny.jpg");
     background-repeat: no-repeat;
-    background-size: 100% auto; 
+    background-size: auto; 
     object-fit: fill;
 }
 
@@ -172,4 +175,51 @@ form > * {
     border-radius: 10px;
     text-align: center;
     cursor: pointer;
+}
+
+@media only screen and (max-width: 1040px) {
+    main {
+        width: 75%;
+    }
+}
+
+@media only screen and (max-width: 708px) {
+    main {
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 571px) {
+    main {
+        width: 92%
+    }
+
+    .content__search {
+        flex-direction: column;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .content__container {
+        gap: 3rem;
+        justify-content: space-around;
+    }
+
+    form > * {
+        height: 30px;
+        width: 250px;
+        border-radius: 15px;
+        padding: 0 10px;
+        background: #204f7a;
+        color: white;
+        border-width: 0px;
+    }
+
+    .forecast-day, h6 {
+        font-size: 0.8rem;
+    }
+
+    .forecast-day p:nth-last-child(4) {
+        font-size: 1.2rem;
+    }
 }

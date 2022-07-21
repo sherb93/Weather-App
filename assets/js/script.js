@@ -2,8 +2,6 @@
 var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
 var cityInputEl = $("#city")
-var today = moment().format("L");
-var currentTime = moment().format("HH:mm a");
 var submitBtn = $("#search-btn");
 var historyEl = $("#previous-searches");
 
@@ -12,6 +10,7 @@ var displayHeader = function(data) {
     // local variables
     var location = $("#location");
     var location2 = $("#location2");
+    var currentTime = moment().format("hh:mm a");
 
     var getWeatherIcon = function(iconCode) {
         var icon = $("#currentIcon");
@@ -21,7 +20,7 @@ var displayHeader = function(data) {
     }
 
     // displays current information to today's header & forecast
-    location.html(`<small class="text-muted"></small>`);
+    location.html(`<small></small>`);
     location.prepend(`${data.name} `);
     location.children("small").text(`as of ${currentTime}`);
 
