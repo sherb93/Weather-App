@@ -15,26 +15,25 @@
         </div>
     </nav>
 
-    <main class="container mt-3 d-flex justify-content-center">
+    <main class="">
 
-        <div class="left-side col-12 col-md-2">
-            <div class="search-wrapper">
-                <form id="city-form" class="d-flex flex-column p-1">
-                    <input type="text" name="city" id="city" class="mb-1" placeholder="Search City">
-                    <input type="submit" id="search-btn">
+        <div class="content__container">
+
+            <div class="content__search">
+                <form id="city-form">
+                    <input type="text" name="city" id="city" class="" placeholder="Search City">
+                </form>
+                <form>
+                    <select name="saved-searches" id="saved-searches">
+                        <option value="">Previous Searches</option>
+                    </select>
                 </form>
             </div>
-            <div id="previous-searches"></div>
-        </div>
 
-        <div class="right-wrapper">
-
-            <div class="today-wrapper border rounded">
-                <div class="title-container">
-                    <h5 id="location" class="title"></h5>
-                </div>
-                <div class="today-content p-2 d-flex justify-content-between">
-                    <div class="information d-flex flex-column">
+            <div class="content__current weather-border">
+                <h5 id="location" class="title"></h5>
+                <div class="today-container">
+                    <div class="today-info">
                         <p id="temp"></p>
                         <p id="wind"></p>
                         <p id="humidity"></p>
@@ -47,10 +46,8 @@
                 </div>
             </div>
 
-            <div class="future-wrapper border rounded">
-                <div class="title-container">
-                    <h5 class="title">Weekly Forecast for <span id="location2"></span></h5>
-                </div>
+            <div class="content__future weather-border">
+                <h5 class="title">Weekly Forecast for <span id="location2"></span></h5>
                 <div id="forecast-container" class="d-flex justify-content-between"></div> 
             </div>
 
