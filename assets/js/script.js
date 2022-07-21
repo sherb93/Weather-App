@@ -3,36 +3,36 @@ var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
 var cityInputEl = $("#city");
 var stateAbr = "";
+var currentTime = moment().format("hh:mm a");
+// var currentTZ = moment().tz(currentTime);
+// console.log(currentTZ);
 var submitBtn = $("#search-btn");
 var historyEl = $("#previous-searches");
 
 // DISPLAYING HEADER INFORMATION //
-var displayHeader = function(data) {
+var displayHeader = function(city, state) {
     // local variables
     var location = $("#location");
     var location2 = $("#location2");
-    var currentTime = moment().format("hh:mm a");
-
-    var getWeatherIcon = function(iconCode) {
-        var icon = $("#currentIcon");
-        var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
-    
-        icon.attr("src", iconUrl);
-    }
 
     // displays current information to today's header & forecast
     location.html(`<small></small>`);
     location.children("small").text(`as of ${currentTime}`);
 
-    if (stateAbr.length > 0) {
-        location.prepend(`${data.name}, ${stateAbr} `);
-        location2.text(`${data.name}, ${stateAbr}`);
+    if (state) {
+        location.prepend(`${city}, ${state} `);
+        location2.text(`${city}, ${state}`);
     } else {
-        location.prepend(`${data.name} `);
-        location2.text(`${data.name}`);
+        location.prepend(`${city} `);
+        location2.text(`${city}`);
     }
+}
 
-    getWeatherIcon(data.weather[0].icon);
+var getWeatherIcon = function(iconCode) {
+    var icon = $("#currentIcon");
+    var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+
+    icon.attr("src", iconUrl);
 }
 
 var displayWeather = function(data) {
@@ -140,12 +140,14 @@ var getCityWeather = function (lat, lon) {
     })
 };
 
-var runOneCallWeather = function(latitude, longitude) {
+// ONECALL gives me all current and forecast weather & icons - but NOT city and state
+var runOneCallWeather = function(lat, lon) {
 
-    fetch(`https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=${latitude}&lon=${longitude}&appid=${APIKey}`).then(function (response) {
+    fetch(`https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=${lat}&lon=${lon}&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
-                console.log(data);
+                console.log("ONECALL: ", data);
+                getWeatherIcon(data.current.weather[0].icon);
                 displayWeather(data);
             });
         } else {
@@ -157,19 +159,37 @@ var runOneCallWeather = function(latitude, longitude) {
     })
 }
 
-var geolocator = function(cityCode, stateCode) {
+var geolocatorCity = function(cityCode, stateCode) {
 
-    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=Athens,Georgia&limit=5&appid=${APIKey}`).then(function (response) {
+    console.log(stateCode);
+
+    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityCode},${stateCode}&limit=5&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i].state === stateCode) {
-                        var lat = data[i].lat;
-                        var lon = data[i].lon;
-                        getCityWeather(lat, lon);
-                    }
-                }
                 console.log("Geolocator:", data);
+
+                if (stateCode) {
+                    for (let i = 0; i < data.length; i++) {
+                        if (stateCode && data[i].state === stateCode) {
+                            console.log(data[i].state);
+                            var city = data[i].name;
+                            var state = data[i].state || data[i].country;
+                            var lat = data[i].lat;
+                            var lon = data[i].lon;
+            
+                            displayHeader(city, state);
+                            runOneCallWeather(lat, lon);
+                        }
+                    }
+                } else {
+                    var city = data[0].name;
+                    var state = data[0].country;
+                    var lat = data[0].lat;
+                    var lon = data[0].lon;
+    
+                    displayHeader(city, state);
+                    runOneCallWeather(lat, lon);
+                }
             });
         } else {
             alert("Error: " + response.statusText);
@@ -177,6 +197,30 @@ var geolocator = function(cityCode, stateCode) {
     })
     .catch(function (error) {
         alert("Unable to connect to OpenWeather");
+    })
+}
+
+var geolocatorReverse = function(lat, lon) {
+
+    fetch(`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&appid=${APIKey}`).then(function (response) {
+        if (response.ok) {
+            response.json().then(function (data) {
+                console.log("Reverse Geolocator:", data);
+
+                var city = data[0].name;
+                var state = data[0].state;
+                var lat = data[0].lat;
+                var lon = data[0].lon;
+
+                displayHeader(city, state);
+                runOneCallWeather(lat, lon);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    })
+    .catch(function (error) {
+        alert("Unable to connect to OpenWeather: ", error);
     })
 }
 
@@ -211,9 +255,9 @@ var saveResult = function(cityName) {
 cityFormEl.on("submit", function(event) {
     event.preventDefault();
 
-    if (!cityInputEl.val().includes(",")) {
-        return alert("Please use proper 'City, State' format.");
-    }
+    // if (!cityInputEl.val().includes(",")) {
+    //     return alert("Please use proper 'City, State' format.");
+    // }
 
     // array for matching user input for state
     var statesArray = [
@@ -271,10 +315,10 @@ cityFormEl.on("submit", function(event) {
 
 
     [city, state] = cityInputEl.val().replace(/\s/g, "").split(",");
-    
-    if (state.length === 2) {
+    console.log(state);
+
+    if (state && state.length === 2) {
         state = state.toUpperCase();
-        stateAbr = state;
 
         var isNotValid = true;
 
@@ -289,7 +333,7 @@ cityFormEl.on("submit", function(event) {
         if (isNotValid) return alert("Please enter a valid US state abbreviation.")
     };
 
-    geolocator(city, state);
+    geolocatorCity(city, state);
 });
 
 //Initialize page with user's location or a default
@@ -297,11 +341,11 @@ var currentLocation = function(userLocation) {
     var lat = userLocation.coords.latitude;
     var lon = userLocation.coords.longitude;
 
-    getCityWeather(lat, lon);
+    geolocatorReverse(lat, lon);
 }
 
 var defaultLocation = function() {
-    getCityWeather(33.9568, -83.3794);
+    geolocatorCity("Athens", "Georgia");
 }
 
-window.navigator.geolocation.getCurrentPosition(currentLocation, console.log);
+window.navigator.geolocation.getCurrentPosition(currentLocation, defaultLocation);
