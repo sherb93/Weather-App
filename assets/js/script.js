@@ -153,6 +153,23 @@ var runOneCallWeather = function(latitude, longitude) {
     })
 }
 
+var geolocator = function(userInput) {
+
+    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=Athens,Georgia&limit=5&appid=${APIKey}`).then(function (response) {
+        if (response.ok) {
+            response.json().then(function (data) {
+
+                console.log("Geolocator:", data);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    })
+    .catch(function (error) {
+        alert("Unable to connect to OpenWeather");
+    })
+}
+
 // LOCAL STORAGE HANDLERS //
 var saveResult = function(cityName) {
     //Create an if statment for Clear button. append if historyEl has no children
@@ -180,18 +197,103 @@ var saveResult = function(cityName) {
 }
 
 
-// BUTTON LISTENERS //
+// // BUTTON LISTENERS //
+// cityFormEl.on("submit", function(event) {
+//     event.preventDefault();
+    
+//     if (!cityInputEl) {
+//         alert("You must enter a city into the search box.")
+//     } else {
+//         getCityWeather(cityInputEl.val());
+//     }
+// });
+
 cityFormEl.on("submit", function(event) {
     event.preventDefault();
-    
-    if (!cityInputEl) {
-        alert("You must enter a city into the search box.")
-    } else {
-        getCityWeather(cityInputEl.val());
+
+    if (!cityInputEl.val().includes(",")) {
+        return alert("Please use proper 'City, State' format.");
     }
+
+    // array for matching user input for state
+    var statesArray = [
+        ['Arizona', 'AZ'],
+        ['Alabama', 'AL'],
+        ['Alaska', 'AK'],
+        ['Arkansas', 'AR'],
+        ['California', 'CA'],
+        ['Colorado', 'CO'],
+        ['Connecticut', 'CT'],
+        ['Delaware', 'DE'],
+        ['Florida', 'FL'],
+        ['Georgia', 'GA'],
+        ['Hawaii', 'HI'],
+        ['Idaho', 'ID'],
+        ['Illinois', 'IL'],
+        ['Indiana', 'IN'],
+        ['Iowa', 'IA'],
+        ['Kansas', 'KS'],
+        ['Kentucky', 'KY'],
+        ['Louisiana', 'LA'],
+        ['Maine', 'ME'],
+        ['Maryland', 'MD'],
+        ['Massachusetts', 'MA'],
+        ['Michigan', 'MI'],
+        ['Minnesota', 'MN'],
+        ['Mississippi', 'MS'],
+        ['Missouri', 'MO'],
+        ['Montana', 'MT'],
+        ['Nebraska', 'NE'],
+        ['Nevada', 'NV'],
+        ['New Hampshire', 'NH'],
+        ['New Jersey', 'NJ'],
+        ['New Mexico', 'NM'],
+        ['New York', 'NY'],
+        ['North Carolina', 'NC'],
+        ['North Dakota', 'ND'],
+        ['Ohio', 'OH'],
+        ['Oklahoma', 'OK'],
+        ['Oregon', 'OR'],
+        ['Pennsylvania', 'PA'],
+        ['Rhode Island', 'RI'],
+        ['South Carolina', 'SC'],
+        ['South Dakota', 'SD'],
+        ['Tennessee', 'TN'],
+        ['Texas', 'TX'],
+        ['Utah', 'UT'],
+        ['Vermont', 'VT'],
+        ['Virginia', 'VA'],
+        ['Washington', 'WA'],
+        ['West Virginia', 'WV'],
+        ['Wisconsin', 'WI'],
+        ['Wyoming', 'WY'],
+    ];
+
+
+    [city, state] = cityInputEl.val().replace(/\s/g, "").split(",");
+    state = state.toUpperCase();
+    console.log(state);
+    
+    if (state.length === 2) {
+        var isNotValid = true;
+
+        for (let i = 0; i < statesArray.length; i++) {
+            if (state === statesArray[i][1]) {
+                state = statesArray[i][0];
+                isNotValid = false;
+                break;
+            };
+        };
+
+        if (isNotValid) return alert("Please enter a valid US state abbreviation.")
+    };
+
+    geolocator(city, state);
 });
 
 //Initialize page with Atlanta, GA
 getCityWeather("Atlanta");
+
+geolocator();
 
 var todayWrapper = document.querySelector(".today-wrapper");
