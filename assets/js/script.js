@@ -56,7 +56,7 @@ var displayWeather = function(data) {
         case UV >= 6 && UV < 8:
             UVScale.css("background", "#f66b34");
             break;
-        case UV >= 8 && UV < 10:
+        case UV >= 8 && UV < 11:
             UVScale.css("background", "#ee154a");
             break;
         case UV >= 11:
@@ -94,7 +94,7 @@ var displayWeather = function(data) {
         headingEl.text(moment().add(i + 1, "day").format("ddd D"));
         highEl.text(`${Math.trunc(data.daily[i].temp.max)}°F`);
         lowEl.text(`${Math.trunc(data.daily[i].temp.min)}°`);
-        humidityEl.text(`${data.daily[i].humidity}% RH`);
+        humidityEl.text(`RH ${data.daily[i].humidity}%`);
 
         // append all info to each forecast block
         blockEl.append(headingEl);
