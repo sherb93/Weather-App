@@ -1,7 +1,8 @@
 // GLOBAL VARIABLES //
 var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
-var cityInputEl = $("#city")
+var cityInputEl = $("#city");
+var stateAbr = "";
 var submitBtn = $("#search-btn");
 var historyEl = $("#previous-searches");
 
@@ -21,10 +22,15 @@ var displayHeader = function(data) {
 
     // displays current information to today's header & forecast
     location.html(`<small></small>`);
-    location.prepend(`${data.name} `);
     location.children("small").text(`as of ${currentTime}`);
 
-    location2.text(`${data.name}`);
+    if (stateAbr.length > 0) {
+        location.prepend(`${data.name}, ${stateAbr} `);
+        location2.text(`${data.name}, ${stateAbr}`);
+    } else {
+        location.prepend(`${data.name} `);
+        location2.text(`${data.name}`);
+    }
 
     getWeatherIcon(data.weather[0].icon);
 }
@@ -112,20 +118,18 @@ var displayWeather = function(data) {
 }
 
 // FETCH API's //
-var getCityWeather = function (city) {
-    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${APIKey}`
+var getCityWeather = function (lat, lon) {
+    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIKey}`
 
     fetch(apiUrl).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
                 //Creates variables for long and lat values that are used to fetch meaningful data from the onecall API
-                var longitude = data.coord.lon;
-                var latitude = data.coord.lat;
-                var cityName = data.name;
+                var locationName = data.name;
                 console.log(data);
-                saveResult(cityName);
+                // saveResult(cityName);
                 displayHeader(data)
-                runOneCallWeather(latitude, longitude);
+                runOneCallWeather(lat, lon);
             });
         } else {
             alert("Error: " + response.statusText);
@@ -153,12 +157,18 @@ var runOneCallWeather = function(latitude, longitude) {
     })
 }
 
-var geolocator = function(userInput) {
+var geolocator = function(cityCode, stateCode) {
 
     fetch(`http://api.openweathermap.org/geo/1.0/direct?q=Athens,Georgia&limit=5&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
-
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].state === stateCode) {
+                        var lat = data[i].lat;
+                        var lon = data[i].lon;
+                        getCityWeather(lat, lon);
+                    }
+                }
                 console.log("Geolocator:", data);
             });
         } else {
@@ -198,16 +208,6 @@ var saveResult = function(cityName) {
 
 
 // // BUTTON LISTENERS //
-// cityFormEl.on("submit", function(event) {
-//     event.preventDefault();
-    
-//     if (!cityInputEl) {
-//         alert("You must enter a city into the search box.")
-//     } else {
-//         getCityWeather(cityInputEl.val());
-//     }
-// });
-
 cityFormEl.on("submit", function(event) {
     event.preventDefault();
 
@@ -271,10 +271,11 @@ cityFormEl.on("submit", function(event) {
 
 
     [city, state] = cityInputEl.val().replace(/\s/g, "").split(",");
-    state = state.toUpperCase();
-    console.log(state);
     
     if (state.length === 2) {
+        state = state.toUpperCase();
+        stateAbr = state;
+
         var isNotValid = true;
 
         for (let i = 0; i < statesArray.length; i++) {
@@ -291,9 +292,16 @@ cityFormEl.on("submit", function(event) {
     geolocator(city, state);
 });
 
-//Initialize page with Atlanta, GA
-getCityWeather("Atlanta");
+//Initialize page with user's location or a default
+var currentLocation = function(userLocation) {
+    var lat = userLocation.coords.latitude;
+    var lon = userLocation.coords.longitude;
 
-geolocator();
+    getCityWeather(lat, lon);
+}
 
-var todayWrapper = document.querySelector(".today-wrapper");
+var defaultLocation = function() {
+    getCityWeather(33.9568, -83.3794);
+}
+
+window.navigator.geolocation.getCurrentPosition(currentLocation, console.log);
