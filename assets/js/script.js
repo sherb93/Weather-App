@@ -69,10 +69,10 @@ var displayWeather = function(data) {
     for (var i = 0; i < 5; i++){
         // create HTML elements
         var blockEl = $("<div>")
+        var borderEl = $("<div>")
         var headingEl = $("<h6>")
         var highEl = $("<p>")
         var lowEl = $("<p>")
-        var windEl = $("<p>")
         var humidityEl = $("<p>")
 
         // forecast icon code from the fetch request
@@ -87,13 +87,13 @@ var displayWeather = function(data) {
             blockEl.append(iconEl);   
         }
 
-        blockEl.addClass( ["forecast-block"] )
+        blockEl.addClass( ["forecast-day"] )
+        borderEl.addClass( ["separator"])
 
         // adding and styling information for each forecast block
         headingEl.text(moment().add(i + 1, "day").format("ddd D"));
         highEl.text(`${Math.trunc(data.daily[i].temp.max)}°F`);
         lowEl.text(`${Math.trunc(data.daily[i].temp.min)}°`);
-        windEl.text(`Wind: ${data.daily[i].wind_speed} MPH`);
         humidityEl.text(`${data.daily[i].humidity}% RH`);
 
         // append all info to each forecast block
@@ -101,10 +101,13 @@ var displayWeather = function(data) {
         blockEl.append(highEl);
         blockEl.append(lowEl);
         getForecastIcon(forecastIconCode);
-        blockEl.append(windEl);
         blockEl.append(humidityEl);
 
         $("#forecast-container").append(blockEl);
+        if (i < 4) {
+            $("#forecast-container").append(borderEl);
+        }
+
 
     }
 }
