@@ -3,7 +3,7 @@ var APIKey = '9ee21022229bd5d692c985f06baf6a14';
 var cityFormEl = $("#city-form");
 var cityInputEl = $("#city");
 var stateAbr = "";
-var currentTime = moment().format("hh:mm a");
+var currentTime = moment().format("hh:mm a z");
 // var currentTZ = moment().tz(currentTime);
 // console.log(currentTZ);
 var submitBtn = $("#search-btn");
@@ -39,6 +39,8 @@ var displayWeather = function(data) {
     $("#forecast-container").empty();
 
     var UV = data.current.uvi;
+    var currentConditions = data.current.weather[0].description;
+    var backgroundEl = $(".content__current");
 
     var temperature = $("#temp");
     var wind = $("#wind");
@@ -49,6 +51,26 @@ var displayWeather = function(data) {
     wind.text(`Wind ${data.current.wind_speed} mph `);
     humidity.text(`RH ${data.current.humidity}%`);
     UVScale.text(`${UV}`);
+
+    switch (true) {
+        case currentConditions.includes("clear"):
+            backgroundEl.css("background-image", "url('assets/icons/sunny.jpg')");
+            break;
+        case currentConditions.includes("cloud"):
+            backgroundEl.css("background-image", "url('assets/icons/cloudy.jpg')");
+            break;
+        case currentConditions.includes("rain"):
+            backgroundEl.css("background-image", "url('assets/icons/rain.webp')");
+            break;
+        case currentConditions.includes("storm"):
+            backgroundEl.css("background-image", "url('assets/icons/thunderstorm.jpg')");
+            break;
+        case currentConditions.includes("snow"):
+            backgroundEl.css("background-image", "url('assets/icons/snow.webp')");
+            break;
+        default:
+            backgroundEl.css("background-image", "url('assets/icons/sunny.jpg')");
+    }
 
     // sets color of UV index
     switch (true) {
@@ -73,12 +95,12 @@ var displayWeather = function(data) {
 
     for (var i = 0; i < 5; i++){
         // create HTML elements
-        var blockEl = $("<div>")
-        var borderEl = $("<div>")
-        var headingEl = $("<h6>")
-        var highEl = $("<p>")
-        var lowEl = $("<p>")
-        var humidityEl = $("<p>")
+        var blockEl = $("<div>");
+        var borderEl = $("<div>");
+        var headingEl = $("<h6>");
+        var highEl = $("<p>");
+        var lowEl = $("<p>");
+        var humidityEl = $("<p>");
 
         // forecast icon code from the fetch request
         var forecastIconCode = data.daily[i].weather[0].icon;
@@ -92,8 +114,10 @@ var displayWeather = function(data) {
             blockEl.append(iconEl);   
         }
 
-        blockEl.addClass( ["forecast-day"] )
-        borderEl.addClass( ["separator"])
+        blockEl.addClass( ["forecast-day"] );
+        borderEl.addClass( ["separator"]);
+
+        
 
         // adding and styling information for each forecast block
         headingEl.text(moment().add(i + 1, "day").format("ddd D"));
@@ -118,27 +142,6 @@ var displayWeather = function(data) {
 }
 
 // FETCH API's //
-var getCityWeather = function (lat, lon) {
-    var apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIKey}`
-
-    fetch(apiUrl).then(function (response) {
-        if (response.ok) {
-            response.json().then(function (data) {
-                //Creates variables for long and lat values that are used to fetch meaningful data from the onecall API
-                var locationName = data.name;
-                console.log(data);
-                // saveResult(cityName);
-                displayHeader(data)
-                runOneCallWeather(lat, lon);
-            });
-        } else {
-            alert("Error: " + response.statusText);
-        }
-    })
-    .catch(function (error) {
-        alert("Unable to connect to OpenWeather");
-    })
-};
 
 // ONECALL gives me all current and forecast weather & icons - but NOT city and state
 var runOneCallWeather = function(lat, lon) {
@@ -169,8 +172,9 @@ var geolocatorCity = function(cityCode, stateCode) {
                 console.log("Geolocator:", data);
 
                 if (stateCode) {
+
                     for (let i = 0; i < data.length; i++) {
-                        if (stateCode && data[i].state === stateCode) {
+                        if (data[i].state && data[i].state.toUpperCase() === stateCode.toUpperCase()) {
                             console.log(data[i].state);
                             var city = data[i].name;
                             var state = data[i].state || data[i].country;
@@ -255,11 +259,6 @@ var saveResult = function(cityName) {
 cityFormEl.on("submit", function(event) {
     event.preventDefault();
 
-    // if (!cityInputEl.val().includes(",")) {
-    //     return alert("Please use proper 'City, State' format.");
-    // }
-
-    // array for matching user input for state
     var statesArray = [
         ['Arizona', 'AZ'],
         ['Alabama', 'AL'],
@@ -314,8 +313,10 @@ cityFormEl.on("submit", function(event) {
     ];
 
 
-    [city, state] = cityInputEl.val().replace(/\s/g, "").split(",");
-    console.log(state);
+    [city, state] = cityInputEl.val().trim().split(/[\s,]+/);
+    console.log(`city: ${city}\nstate: ${state}`)
+    if (city) city = city.trim();
+    if (state) state = state.trim();
 
     if (state && state.length === 2) {
         state = state.toUpperCase();
