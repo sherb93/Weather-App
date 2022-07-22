@@ -4,14 +4,12 @@ var cityFormEl = $("#city-form");
 var cityInputEl = $("#city");
 var stateAbr = "";
 var currentTime = moment().format("hh:mm a z");
-// var currentTZ = moment().tz(currentTime);
-// console.log(currentTZ);
 var submitBtn = $("#search-btn");
 var historyEl = $("#previous-searches");
 
 // DISPLAYING HEADER INFORMATION //
 var displayHeader = function(city, state) {
-    // local variables
+    // target nodes for adding location info
     var location = $("#location");
     var location2 = $("#location2");
 
@@ -29,6 +27,7 @@ var displayHeader = function(city, state) {
 }
 
 var getWeatherIcon = function(iconCode) {
+    // takes icon code as argument, fetches img from openweather, and attaches to icon element
     var icon = $("#currentIcon");
     var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
 
@@ -36,23 +35,25 @@ var getWeatherIcon = function(iconCode) {
 }
 
 var displayWeather = function(data) {
+    // clear container of any past 
     $("#forecast-container").empty();
 
     var UV = data.current.uvi;
     var currentConditions = data.current.weather[0].description;
-    var backgroundEl = $(".content__current");
-
+    
+    // target info elements in HTML
     var temperature = $("#temp");
     var wind = $("#wind");
     var humidity = $("#humidity");
     var UVScale = $("#uv-scale");
-
+    
     temperature.text(`${Math.trunc(data.current.temp)}°`);
     wind.text(`Wind ${data.current.wind_speed} mph `);
     humidity.text(`RH ${data.current.humidity}%`);
     UVScale.text(`${UV}`);
-
+    
     // sets background to current corresponding weather
+    var backgroundEl = $(".content__current");
     switch (true) {
         case currentConditions.includes("clear"):
             backgroundEl.css("background-image", "url('assets/icons/sunny.jpg')");
@@ -205,7 +206,7 @@ var geolocatorCity = function(cityCode, stateCode) {
 
 var geolocatorReverse = function(lat, lon) {
 
-    fetch(`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&appid=${APIKey}`).then(function (response) {
+    fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
                 console.log("Reverse Geolocator:", data);

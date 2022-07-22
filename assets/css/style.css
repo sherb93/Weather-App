@@ -79,8 +79,10 @@ form > * {
 
 .content__current {
     background-image: url("../icons/sunny.jpg");
+    background: rgba(138, 138, 138, 0.5);
     background-repeat: no-repeat;
-    background-size: 100% auto; 
+    background-blend-mode: multiply;
+    background-size: 100% auto;
     object-fit: fill;
 }
 
