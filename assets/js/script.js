@@ -30,7 +30,7 @@ var displayHeader = function(city, state) {
 
 var getWeatherIcon = function(iconCode) {
     var icon = $("#currentIcon");
-    var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+    var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
 
     icon.attr("src", iconUrl);
 }
@@ -52,6 +52,7 @@ var displayWeather = function(data) {
     humidity.text(`RH ${data.current.humidity}%`);
     UVScale.text(`${UV}`);
 
+    // sets background to current corresponding weather
     switch (true) {
         case currentConditions.includes("clear"):
             backgroundEl.css("background-image", "url('assets/icons/sunny.jpg')");
@@ -108,7 +109,7 @@ var displayWeather = function(data) {
         // fetches and appends forecast icon to forecast block
         var getForecastIcon = function(iconCode) {
             var iconEl = $("<img>");
-            var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + ".png";
+            var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + ".png";
         
             iconEl.attr("src", iconUrl);
             blockEl.append(iconEl);   
@@ -116,8 +117,6 @@ var displayWeather = function(data) {
 
         blockEl.addClass( ["forecast-day"] );
         borderEl.addClass( ["separator"]);
-
-        
 
         // adding and styling information for each forecast block
         headingEl.text(moment().add(i + 1, "day").format("ddd D"));
@@ -166,7 +165,7 @@ var geolocatorCity = function(cityCode, stateCode) {
 
     console.log(stateCode);
 
-    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityCode},${stateCode}&limit=5&appid=${APIKey}`).then(function (response) {
+    fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${cityCode},${stateCode}&limit=5&appid=${APIKey}`).then(function (response) {
         if (response.ok) {
             response.json().then(function (data) {
                 console.log("Geolocator:", data);

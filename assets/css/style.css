@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    line-height: 1.3
+    line-height: 1.3;
+    font-family: 'Albert Sans', sans-serif; 
 }
 
 input:focus,
@@ -34,6 +37,11 @@ body {
 }
 
 /*///// MAIN PAGE ///////*/
+#heading {
+    font-weight: 600;
+    letter-spacing: 0.2rem;
+}
+
 main {
     width: 50%;
     margin: 1rem auto;
@@ -56,7 +64,7 @@ form > * {
     width: 250px;
     border-radius: 15px;
     padding: 0 10px;
-    background: #204f7a;
+    background: #2b74b9;
     color: white;
     border-width: 0px;
     text-align: center;
